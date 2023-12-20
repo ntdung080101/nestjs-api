@@ -1,0 +1,1 @@
+export const CUSTOMER_COMMAND_HANDLERS = [];
