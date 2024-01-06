@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { AccountRules } from '../../../../enums/role.enum';
-import { checkHashing } from '../../../../utils/hashing';
+import { checkHashing, hashing } from '../../../../utils/hashing';
 import { CustomerEntity } from '../../../store/entities/customer.entity';
 import { StaffEntity } from '../../../store/entities/staff.entity';
 import {
@@ -36,6 +36,9 @@ export class LoginHandler implements IQueryHandler<LoginQuery> {
         return taiKhoan;
       }
 
+      const password = await hashing(query.password);
+
+      console.log(password);
       const isPassword = await checkHashing(query.password, taiKhoan.mat_khau);
 
       if (!isPassword) {

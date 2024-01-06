@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -9,6 +10,7 @@ import {
 } from 'class-validator';
 
 export class UpdateProductDto {
+  @Transform(({ value }) => +value)
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0 })
@@ -27,16 +29,19 @@ export class UpdateProductDto {
   })
   name!: string;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
   price!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
   categoryCode!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0 })

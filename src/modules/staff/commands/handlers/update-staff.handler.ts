@@ -20,6 +20,7 @@ export class UpdateStaffHandler implements ICommandHandler<UpdateStaffCommand> {
       query.phoneNumber,
       query.gender,
       query.role,
+      query.avatar,
     );
   }
 }

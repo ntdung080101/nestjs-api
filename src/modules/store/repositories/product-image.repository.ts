@@ -33,13 +33,30 @@ export class ProductImageRepository {
   }
 
   async listProductImage(
-    imageCode: number,
+    productCode: number,
   ): Promise<Array<ProductImageEntity> | Error> {
     try {
-      this.logger.verbose('.listCategory', { imageCode });
+      this.logger.verbose('.listCategory', { imageCode: productCode });
 
       return this.productImageRepository.find({
-        where: { ma_san_pham: imageCode },
+        where: { ma_san_pham: productCode },
+      });
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return new Error((e as Error).message);
+    }
+  }
+
+  async getProductImage(
+    productCode: number,
+    imagePath: string,
+  ): Promise<Array<ProductImageEntity> | Error> {
+    try {
+      this.logger.verbose('.getProductImage', { productCode, imagePath });
+
+      return this.productImageRepository.find({
+        where: { ma_san_pham: productCode, hinh_anh: imagePath },
       });
     } catch (e) {
       this.logger.error((e as Error).message);
@@ -81,6 +98,29 @@ export class ProductImageRepository {
         ma: code,
         ma_san_pham: productCode,
       });
+
+      this.logger.debug(JSON.stringify(result, null, 2));
+
+      return true;
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
+  async updateImage(
+    code: number,
+    oldPath: string,
+    newPath: string,
+  ): Promise<boolean | Error> {
+    try {
+      this.logger.verbose('.updateImage', { code, oldPath, newPath });
+
+      const result = await this.productImageRepository.update(
+        { ma_san_pham: code, hinh_anh: oldPath },
+        { hinh_anh: newPath },
+      );
 
       this.logger.debug(JSON.stringify(result, null, 2));
 

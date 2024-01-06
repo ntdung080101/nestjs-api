@@ -90,6 +90,7 @@ export class StaffRepository {
     phoneNumber: string,
     gender: number,
     permission: number,
+    avatar: string,
   ): Promise<boolean | Error> {
     try {
       this.logger.verbose('updateStaff', {
@@ -99,6 +100,7 @@ export class StaffRepository {
         phoneNumber,
         gender,
         permission,
+        avatar,
       });
 
       const result = await this.staffRepository.update(
@@ -109,6 +111,7 @@ export class StaffRepository {
           so_dien_thoai: phoneNumber,
           gioi_tinh: gender,
           phan_quyen: permission,
+          hinh_anh: avatar,
         },
       );
 
@@ -129,6 +132,7 @@ export class StaffRepository {
     phoneNumber: string,
     role: StaffRules,
     accountCode: number,
+    image?: string,
   ): Promise<boolean | Error> {
     try {
       this.logger.verbose('createStaff');
@@ -141,6 +145,7 @@ export class StaffRepository {
         phan_quyen: StaffPermission.STAFF,
         so_dien_thoai: phoneNumber,
         ma_tai_khoan: accountCode,
+        hinh_anh: image,
       });
 
       this.logger.debug(JSON.stringify(result, null, 2));

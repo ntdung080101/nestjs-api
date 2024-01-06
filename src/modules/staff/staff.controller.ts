@@ -7,10 +7,21 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { Roles } from '../../decorator/roles.decorator';
 import { CreateStaffDto } from '../../dtos/create-staff.dto';
@@ -21,7 +32,10 @@ import { UpdateStaffDto } from '../../dtos/update-staff.dto';
 import { AccountRules, Role } from '../../enums/role.enum';
 import { RolesGuard } from '../../guard/roles.guard';
 import { BaseResponseInterface } from '../../interfaces/common-interfaces/base.response.interface';
-import { CreateAccountCommand } from '../account/commands/impl';
+import {
+  CreateAccountCommand,
+  DeleteAccountCommand,
+} from '../account/commands/impl';
 import { AccountEntity } from '../store/entities';
 import { StaffEntity } from '../store/entities/staff.entity';
 import {
@@ -101,13 +115,48 @@ export class StaffController {
   }
 
   @Post('create')
-  @ApiOperation({ summary: 'create new staff' })
-  @Roles(Role.ADMIN, Role.MANAGER)
-  @UseGuards(RolesGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: (req, file, cb) => {
+        file.filename = Date.now() + '-' + file.originalname;
+
+        cb(null, true);
+      },
+    }),
+  )
   async createStaff(
     @Body() query: CreateStaffDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<BaseResponseInterface<boolean>> {
-    this.logger.verbose('getStaffByCode', { query });
+    this.logger.verbose('.createStaff', { file, query });
+
+    let fileUploaded = '';
+
+    if (file) {
+      fileUploaded =
+        file.filename +
+        '.' +
+        file.originalname.split('.').splice(-1).toString();
+
+      const oldPath = file.path;
+      const newPath = path.join(file.destination, fileUploaded);
+
+      fs.renameSync(oldPath, newPath);
+    }
+
+    this.logger.verbose('.createStaff', { query });
 
     const accountResult = await this.commandBus.execute<
       CreateAccountCommand,
@@ -139,6 +188,7 @@ export class StaffController {
         query.phoneNumber,
         query.role,
         accountResult.ma,
+        fileUploaded,
       ),
     );
 
@@ -158,13 +208,63 @@ export class StaffController {
   }
 
   @Put('update')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: (req, file, cb) => {
+        file.filename = Date.now() + '-' + file.originalname;
+
+        cb(null, true);
+      },
+    }),
+  )
   @ApiOperation({ summary: 'update staff information' })
   @Roles(Role.ADMIN, Role.MANAGER)
   @UseGuards(RolesGuard)
   async updateStaff(
     @Body() query: UpdateStaffDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<BaseResponseInterface<boolean>> {
     this.logger.verbose('updateStaff', { query });
+
+    const staffResult = await this.queryBus.execute<
+      GetStaffByCodeQuery,
+      StaffEntity | Error
+    >(new GetStaffByCodeQuery(query.code));
+
+    if (staffResult instanceof Error) {
+      return {
+        statusCode: 400,
+        error: (staffResult as Error).message,
+        message: [],
+      };
+    }
+
+    let fileUploaded = '';
+    const oldPath = staffResult.hinh_anh ?? '';
+
+    if (file) {
+      fileUploaded =
+        file.filename +
+        '.' +
+        file.originalname.split('.').splice(-1).toString();
+
+      const oldPath = file.path;
+      const newPath = path.join(file.destination, fileUploaded);
+
+      fs.renameSync(oldPath, newPath);
+    }
 
     const result = await this.commandBus.execute<
       UpdateStaffCommand,
@@ -177,6 +277,7 @@ export class StaffController {
         query.phoneNumber,
         query.gender,
         query.permission,
+        fileUploaded === '' ? oldPath : fileUploaded,
       ),
     );
 
@@ -186,6 +287,13 @@ export class StaffController {
         error: (result as Error).message,
         message: [],
       };
+    }
+
+    if (oldPath != '' && fileUploaded != '') {
+      const oldFile = path.join(file.destination, oldPath);
+      if (fs.existsSync(oldFile)) {
+        fs.unlinkSync(oldFile);
+      }
     }
 
     return {
@@ -216,6 +324,10 @@ export class StaffController {
         message: [],
       };
     }
+
+    await this.commandBus.execute<DeleteAccountCommand, boolean | Error>(
+      new DeleteAccountCommand(query.code),
+    );
 
     return {
       statusCode: 200,

@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 
 import { BaseEntity } from './base.entity';
+import { CategoryEntity } from './category.entity';
 
 @Entity({
   name: 'san_pham',
@@ -13,6 +14,9 @@ export class ProductEntity extends BaseEntity {
   gia!: number;
 
   @Column({ type: 'int' })
+  @OneToOne(() => CategoryEntity, (category) => category.ma, {
+    cascade: ['remove'],
+  })
   ma_loai!: number;
 
   @Column({ type: 'int' })

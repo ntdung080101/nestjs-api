@@ -11,6 +11,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { DetailOrderModule } from './modules/detail-order/detail-order.module';
+import { ImageModule } from './modules/image/image.module';
 import { MailModule } from './modules/mail/mail.module';
 import { OrderModule } from './modules/order/order.module';
 import { ProductModule } from './modules/product/product.module';
@@ -51,6 +52,7 @@ import { loadConfiguration } from './utils/load-configuration';
     ProductModule,
     ProductImageModule,
     DetailOrderModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [],

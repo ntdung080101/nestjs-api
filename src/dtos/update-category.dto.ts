@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -8,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class UpdateCategoryDto {
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({
     type: 'int',

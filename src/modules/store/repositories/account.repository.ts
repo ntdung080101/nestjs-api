@@ -39,6 +39,22 @@ export class AccountRepository {
     }
   }
 
+  async deleteAccount(code: number): Promise<boolean | Error> {
+    try {
+      this.logger.verbose('.deleteAccount', { code });
+
+      await this.accountRepository.delete({
+        ma: code,
+      });
+
+      return true;
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
   async findOneAccount(
     username: string,
     role: AccountRules,

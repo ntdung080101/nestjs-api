@@ -15,7 +15,7 @@ export class ProductRepository {
     try {
       this.logger.verbose('.listAllProduct');
 
-      return this.rateRepository.find({});
+      return this.rateRepository.find();
     } catch (e) {
       this.logger.error((e as Error).message);
 
@@ -52,7 +52,7 @@ export class ProductRepository {
     ram: string,
     hardDrive: string,
     screen: string,
-  ): Promise<boolean | Error> {
+  ): Promise<number | Error> {
     try {
       this.logger.verbose('.createProduct', {
         name,
@@ -76,9 +76,7 @@ export class ProductRepository {
         so_luong: count,
       });
 
-      this.logger.debug(JSON.stringify(result, null, 2));
-
-      return true;
+      return result.identifiers[0].ma;
     } catch (e) {
       this.logger.error((e as Error).message);
 

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
-  IsPositive,
   IsString,
   MaxLength,
   MinLength,
@@ -22,19 +22,19 @@ export class CreateProductDto {
   })
   name!: string;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
-  @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
   price!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
-  @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
   categoryCode!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
-  @IsPositive()
-  @ApiProperty({ type: 'int', required: false, default: 0 })
+  @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
   count!: number;
 
   @IsString()

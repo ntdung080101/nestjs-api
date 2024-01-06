@@ -12,6 +12,52 @@ export class CustomerRepository {
     private readonly customerRepository: Repository<CustomerEntity>,
   ) {}
 
+  async listCustomer(): Promise<Array<CustomerEntity> | Error> {
+    try {
+      this.logger.verbose('.listCustomer');
+
+      return await this.customerRepository.find({});
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
+  async deleteCustomer(code: number): Promise<boolean | Error> {
+    try {
+      this.logger.verbose('.deleteCustomer');
+
+      await this.customerRepository.delete({ ma: code });
+
+      return true;
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
+  async getCustomer(id: number): Promise<CustomerEntity | Error> {
+    try {
+      this.logger.verbose('.getCustomer', { id });
+
+      const result = await this.customerRepository.findOne({
+        where: { ma: id },
+      });
+
+      if (result === null) {
+        return new Error('Customer not found');
+      }
+
+      return result;
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
   async findOneAccountByCode(id: number): Promise<CustomerEntity | Error> {
     try {
       this.logger.verbose('.findOneCustomer', { id });

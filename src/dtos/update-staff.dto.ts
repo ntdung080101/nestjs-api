@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsAlphanumeric,
   IsNotEmpty,
@@ -8,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class UpdateStaffDto {
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({
     type: 'int',
@@ -50,6 +52,7 @@ export class UpdateStaffDto {
   })
   phoneNumber!: string;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({
     type: 'int',
@@ -59,6 +62,7 @@ export class UpdateStaffDto {
   })
   permission!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({
     type: 'int',

@@ -30,4 +30,7 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ type: 'int' })
   ma_tai_khoan!: number;
+
+  @Column({ type: 'varchar', default: '' })
+  hinh_anh?: string = '';
 }

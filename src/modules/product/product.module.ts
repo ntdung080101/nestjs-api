@@ -5,6 +5,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { MulterModule } from '@nestjs/platform-express';
 
 import { AuthMiddleware } from '../../middlewares/auth.middleware';
 import { StoreModule } from '../store/store.module';
@@ -13,7 +14,15 @@ import { ProductController } from './product.controller';
 import { PRODUCT_QUERY_HANDLERS } from './queries/handlers';
 
 @Module({
-  imports: [CqrsModule, StoreModule],
+  imports: [
+    CqrsModule,
+    StoreModule,
+    MulterModule.registerAsync({
+      useFactory: () => ({
+        dest: 'access',
+      }),
+    }),
+  ],
   providers: [...PRODUCT_COMMAND_HANDLERS, ...PRODUCT_QUERY_HANDLERS],
   controllers: [ProductController],
 })

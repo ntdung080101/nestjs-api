@@ -6,5 +6,6 @@ export class CreateStaffCommand {
     public readonly phoneNumber: string,
     public readonly role: number,
     public readonly accountCode: number,
+    public readonly image?: string,
   ) {}
 }

@@ -19,6 +19,7 @@ export class CreateStaffHandler implements ICommandHandler<CreateStaffCommand> {
       query.phoneNumber,
       query.role,
       query.accountCode,
+      query.image,
     );
   }
 }

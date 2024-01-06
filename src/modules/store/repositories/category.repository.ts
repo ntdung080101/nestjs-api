@@ -32,6 +32,26 @@ export class CategoryRepository {
     }
   }
 
+  async getCategory(code: number): Promise<CategoryEntity | Error> {
+    try {
+      this.logger.verbose('.getCategory', { code });
+
+      const category = await this.categoryRepository.findOne({
+        where: { ma: code },
+      });
+
+      if (category === null) {
+        return Error('Category not found');
+      }
+
+      return category;
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
   async listCategory(): Promise<Array<CategoryEntity> | Error> {
     try {
       this.logger.verbose('.listCategory');

@@ -12,7 +12,7 @@ export class CreateProductHandler
 
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async execute(query: CreateProductCommand): Promise<boolean | Error> {
+  async execute(query: CreateProductCommand): Promise<number | Error> {
     this.logger.verbose('.execute', { query });
 
     return this.productRepository.createProduct(

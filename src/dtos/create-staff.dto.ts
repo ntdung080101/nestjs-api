@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsAlphanumeric,
   IsNotEmpty,
@@ -54,10 +55,12 @@ export class CreateStaffDto {
   })
   phoneNumber!: string;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({ required: true, default: 0, type: 'int' })
   gender!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({ required: true, default: 0, type: 'int' })
   role!: number;

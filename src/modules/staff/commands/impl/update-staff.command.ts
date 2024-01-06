@@ -8,5 +8,6 @@ export class UpdateStaffCommand {
     public readonly phoneNumber: string,
     public readonly gender: number,
     public readonly role: StaffRules,
+    public readonly avatar: string,
   ) {}
 }

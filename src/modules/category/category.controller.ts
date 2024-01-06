@@ -26,7 +26,8 @@ import {
   DeleteCategoryCommand,
   UpdateCategoryCommand,
 } from './commands/impl';
-import { ListCategoryQuery } from './queries/impl';
+import {GetCategoryQuery, ListCategoryQuery} from './queries/impl';
+import {GetCategoryDto} from "../../dtos/get-category.dto";
 
 @Controller('category')
 @ApiTags('category')
@@ -79,6 +80,35 @@ export class CategoryController {
       ListCategoryQuery,
       Array<CategoryEntity> | Error
     >(new ListCategoryQuery());
+
+    if (result instanceof Error) {
+      this.logger.error((result as Error).message);
+
+      return {
+        statusCode: 400,
+        error: (result as Error).message,
+        message: [],
+      };
+    }
+
+    return {
+      statusCode: 200,
+      message: result,
+      error: undefined,
+    };
+  }
+
+  @Get('get')
+  @ApiOperation({ summary: 'get category of product' })
+  async getCategory(
+    @Query() query: { code: number },
+  ): Promise<BaseResponseInterface<CategoryEntity>> {
+    this.logger.verbose('.getCategory', { query });
+
+    const result = await this.queryBus.execute<
+      GetCategoryQuery,
+      CategoryEntity | Error
+    >(new GetCategoryQuery(query.code));
 
     if (result instanceof Error) {
       this.logger.error((result as Error).message);
