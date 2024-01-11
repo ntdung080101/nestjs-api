@@ -95,7 +95,7 @@ export class OrderController {
   }
 
   @Post('create')
-  @ApiOperation({ summary: 'create one order side admin' })
+  @ApiOperation({ summary: 'create one order' })
   @Roles(Role.ADMIN, Role.MANAGER, Role.STAFF, Role.CUSTOMER)
   @UseGuards(RolesGuard)
   async createOrder(

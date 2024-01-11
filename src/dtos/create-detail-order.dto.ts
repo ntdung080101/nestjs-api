@@ -20,5 +20,5 @@ export class CreateDetailOrderDto {
   @IsNumber()
   @IsPositive()
   @ApiProperty({ type: 'int', required: false, default: 0, minimum: 0 })
-  productCode!: number;
+  productCode!: Array<number>;
 }

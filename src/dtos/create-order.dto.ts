@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
-  IsAlphanumeric,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -9,7 +9,8 @@ import {
 } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsAlphanumeric()
+  @Transform(({ value }) => +value)
+  @IsNumber()
   @ApiProperty({
     type: 'int',
     required: false,

@@ -11,11 +11,17 @@ export class ProductRepository {
     private readonly rateRepository: Repository<ProductEntity>,
   ) {}
 
-  async listAllProduct(): Promise<Array<ProductEntity> | Error> {
+  async listAllProduct(
+    page: number,
+    limit: number,
+  ): Promise<Array<ProductEntity> | Error> {
     try {
-      this.logger.verbose('.listAllProduct');
+      this.logger.verbose('.listAllProduct', { page, limit });
 
-      return this.rateRepository.find();
+      return this.rateRepository.find({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
     } catch (e) {
       this.logger.error((e as Error).message);
 
