@@ -56,8 +56,8 @@ export class ProductController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get('list-all')
-  @ApiOperation({ summary: 'list all product' })
+  @Get('list')
+  @ApiOperation({ summary: 'list product' })
   async listAllProduct(
     @Query() query: ListAllProductDto,
   ): Promise<
@@ -65,12 +65,12 @@ export class ProductController {
       Array<ProductEntity & { imagePath?: Array<string>; loai: string }>
     >
   > {
-    this.logger.verbose('.listAllProduct', { query });
+    this.logger.verbose('.listProduct', { query });
 
     let result = await this.queryBus.execute<
       ListAllProductQuery,
       Array<ProductEntity & { loai: string }> | Error
-    >(new ListAllProductQuery());
+    >(new ListAllProductQuery(query.page, query.limit));
 
     if (result instanceof Error) {
       return {

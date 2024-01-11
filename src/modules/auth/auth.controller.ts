@@ -50,9 +50,13 @@ export class AuthController {
   ) {}
 
   @Post('/login-customer')
-  async loginCustomer(
-    @Body() request: LoginDto,
-  ): Promise<BaseResponseInterface<string> | Error> {
+  async loginCustomer(@Body() request: LoginDto): Promise<
+    | BaseResponseInterface<{
+        token: string;
+        id: number;
+      }>
+    | Error
+  > {
     this.logger.verbose('.loginCustomer', { request });
 
     const khachHang = await this.queryBus.execute<
@@ -76,7 +80,10 @@ export class AuthController {
 
     return {
       statusCode: 200,
-      message: await this.jwtService.signAsync(payload),
+      message: {
+        token: await this.jwtService.signAsync(payload),
+        id: khachHang.ma,
+      },
       error: undefined,
     };
   }

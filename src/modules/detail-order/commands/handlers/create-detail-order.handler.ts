@@ -15,11 +15,17 @@ export class CreateDetailOrderHandler
   async execute(query: CreateDetailOrderCommand): Promise<boolean | Error> {
     this.logger.verbose('.execute', { query });
 
-    return this.detailOrderRepository.createDetailOrder(
-      query.orderCode,
-      query.productCode,
-      query.count,
-      query.price,
-    );
+    for (let index = 0; index < query.productCode.length; index++) {
+      const productCode = query.productCode[index];
+
+      await this.detailOrderRepository.createDetailOrder(
+        query.orderCode,
+        productCode,
+        query.count,
+        query.price,
+      );
+    }
+
+    return true;
   }
 }

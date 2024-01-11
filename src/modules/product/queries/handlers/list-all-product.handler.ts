@@ -18,6 +18,6 @@ export class ListAllProductHandler
   ): Promise<Array<ProductEntity> | Error> {
     this.logger.verbose('.execute', { query });
 
-    return this.productRepository.listAllProduct();
+    return this.productRepository.listAllProduct(query.page, query.limit);
   }
 }

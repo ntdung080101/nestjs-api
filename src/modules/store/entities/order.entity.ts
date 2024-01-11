@@ -23,4 +23,13 @@ export class OrderEntity extends BaseEntity {
 
   @Column({ type: 'int' })
   trang_thai: number = 0;
+
+  @Column({ type: 'varchar' })
+  ngay_dat: string = new Date().toISOString();
+
+  @Column({ type: 'int' })
+  tong_tien: number = 0;
+
+  @Column({ type: 'int' })
+  loai: number = 0;
 }

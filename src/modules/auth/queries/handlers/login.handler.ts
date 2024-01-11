@@ -38,7 +38,6 @@ export class LoginHandler implements IQueryHandler<LoginQuery> {
 
       const password = await hashing(query.password);
 
-      console.log(password);
       const isPassword = await checkHashing(query.password, taiKhoan.mat_khau);
 
       if (!isPassword) {
