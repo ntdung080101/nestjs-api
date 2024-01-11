@@ -67,6 +67,7 @@ export class CommentRepository {
         ma_san_pham: productCode,
         noi_dung: content,
         tra_loi: reply,
+        thoi_gian: new Date().toISOString,
       });
 
       this.logger.debug(JSON.stringify(insertResult, null, 2));

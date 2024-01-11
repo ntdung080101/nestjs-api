@@ -22,7 +22,9 @@ import { UpdateCommentDto } from '../../dtos/update-comment.dto';
 import { Role } from '../../enums/role.enum';
 import { RolesGuard } from '../../guard/roles.guard';
 import { BaseResponseInterface } from '../../interfaces/common-interfaces/base.response.interface';
+import { GetCustomerQuery } from '../customer/queries/impl';
 import { CommentEntity } from '../store/entities/comment.entity';
+import { CustomerEntity } from '../store/entities/customer.entity';
 import {
   CreateCommentCommand,
   DeleteCommentCommand,
@@ -45,12 +47,16 @@ export class CommentController {
   @ApiOperation({ summary: 'list all comment of product' })
   async listAllComment(
     @Query() query: ListAllCommentDto,
-  ): Promise<BaseResponseInterface<Array<CommentEntity>>> {
+  ): Promise<
+    BaseResponseInterface<
+      Array<CommentEntity & { khach_hang?: CustomerEntity }>
+    >
+  > {
     this.logger.verbose('.listAllComment', { query });
 
     const result = await this.queryBus.execute<
       ListAllCommentQuery,
-      Array<CommentEntity> | Error
+      Array<CommentEntity & { khach_hang?: CustomerEntity }> | Error
     >(new ListAllCommentQuery(query.productCode));
 
     if (result instanceof Error) {
@@ -59,6 +65,19 @@ export class CommentController {
         error: (result as Error).message,
         message: [],
       };
+    }
+
+    for (let index = 0; index < result.length; index++) {
+      const id = result[index].ma_khach_hang;
+
+      const khachhang = await this.queryBus.execute<
+        GetCustomerQuery,
+        CustomerEntity | Error
+      >(new GetCustomerQuery(id));
+
+      if (!(khachhang instanceof Error)) {
+        result[index].khach_hang = khachhang;
+      }
     }
 
     return {
@@ -105,7 +124,7 @@ export class CommentController {
   ): Promise<BaseResponseInterface<boolean>> {
     this.logger.verbose('.createProvider', { query });
 
-    const userId = headers['info']['ma_tai_khoan'];
+    const userId = headers['info']['ma'];
 
     const result = await this.commandBus.execute<
       CreateCommentCommand,

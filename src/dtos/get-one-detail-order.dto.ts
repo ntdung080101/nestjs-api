@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsAlphanumeric, IsNumber } from 'class-validator';
 
 export class GetOneDetailOrderDto {
-  @IsAlphanumeric()
+  @Transform(({ value }) => +value)
+  @IsNumber()
   @ApiProperty({ type: 'int', required: false, default: 0 })
   code!: number;
 }

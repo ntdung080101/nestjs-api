@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNumber } from 'class-validator';
 
 export class ListAllCommentDto {
-  @IsAlphanumeric()
+  @Transform(({ value }) => +value)
+  @IsNumber()
   @ApiProperty({ type: 'int', required: false, default: 0 })
   productCode!: number;
 }

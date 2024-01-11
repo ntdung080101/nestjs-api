@@ -13,9 +13,13 @@ export class ListAllProductHandler
 
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async execute(
-    query: ListAllProductQuery,
-  ): Promise<Array<ProductEntity> | Error> {
+  async execute(query: ListAllProductQuery): Promise<
+    | {
+        data: Array<ProductEntity>;
+        total: number;
+      }
+    | Error
+  > {
     this.logger.verbose('.execute', { query });
 
     return this.productRepository.listAllProduct(query.page, query.limit);

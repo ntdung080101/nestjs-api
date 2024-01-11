@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Logger,
   Post,
   Put,
@@ -17,6 +18,7 @@ import { CreateOrderDto } from '../../dtos/create-order.dto';
 import { DeleteOrderDto } from '../../dtos/delete-order.dto';
 import { GetOrderDto } from '../../dtos/get-order.dto';
 import { ListAllOrderDto } from '../../dtos/list-all-order.dto';
+import { ListAllOrderByTypeDto } from '../../dtos/list-all-order-by-type.dto';
 import { UpdateOrderDto } from '../../dtos/update-order.dto';
 import { Role } from '../../enums/role.enum';
 import { RolesGuard } from '../../guard/roles.guard';
@@ -27,7 +29,11 @@ import {
   DeleteOrderCommand,
   UpdateOrderCommand,
 } from './commands/impl';
-import { GetOneOrderQuery, ListAllOrderQuery } from './queries/impl';
+import {
+  GetOneOrderQuery,
+  ListAllOrderQuery,
+  ListOrderByTypeQuery, ListOrderOfMeQuery,
+} from './queries/impl';
 
 @Controller('order')
 @ApiTags('Order')
@@ -59,6 +65,64 @@ export class OrderController {
         message: [],
       };
     }
+
+    return {
+      statusCode: 200,
+      message: result,
+      error: undefined,
+    };
+  }
+
+  @Get('list-by-type')
+  @ApiOperation({ summary: 'list all order' })
+  async listAllOrderByType(
+    @Query() query: ListAllOrderByTypeDto,
+  ): Promise<BaseResponseInterface<Array<OrderEntity>>> {
+    this.logger.verbose('.listAllOrderByType', { query });
+
+    const result = await this.queryBus.execute<
+      ListOrderByTypeQuery,
+      Array<OrderEntity> | Error
+    >(new ListOrderByTypeQuery(query.type));
+
+    if (result instanceof Error) {
+      return {
+        statusCode: 400,
+        error: (result as Error).message,
+        message: [],
+      };
+    }
+
+    return {
+      statusCode: 200,
+      message: result,
+      error: undefined,
+    };
+  }
+
+  @Get('list-order-of-me')
+  @ApiOperation({ summary: 'list all order of me' })
+  async listOrderOfMe(
+    @Query() query: ListAllOrderDto,
+    @Headers() headers: Record<string, never>,
+  ): Promise<BaseResponseInterface<Array<OrderEntity>>> {
+    this.logger.verbose('.listOrderOfMe', { query });
+
+    const userId = headers['info']['ma'];
+    const result = await this.queryBus.execute<
+      ListOrderOfMeQuery,
+      Array<OrderEntity> | Error
+    >(new ListOrderOfMeQuery(userId));
+
+    if (result instanceof Error) {
+      return {
+        statusCode: 400,
+        error: (result as Error).message,
+        message: [],
+      };
+    }
+
+    console.log(JSON.stringify(result, null, 2))
 
     return {
       statusCode: 200,

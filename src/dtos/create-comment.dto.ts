@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -8,14 +9,12 @@ import {
 } from 'class-validator';
 
 export class CreateCommentDto {
-  @IsNumber()
-  @ApiProperty({ type: 'int', required: false, default: 0 })
-  customerCode!: number;
-
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({ type: 'int', required: false, default: 0 })
   productCode!: number;
 
+  @Transform(({ value }) => +value)
   @IsNumber()
   @ApiProperty({ type: 'int', required: false, default: 0 })
   rely!: number | null;

@@ -8,20 +8,25 @@ export class ProductRepository {
   private logger = new Logger(ProductRepository.name);
   constructor(
     @InjectRepository(ProductEntity)
-    private readonly rateRepository: Repository<ProductEntity>,
+    private readonly productRepository: Repository<ProductEntity>,
   ) {}
 
   async listAllProduct(
     page: number,
     limit: number,
-  ): Promise<Array<ProductEntity> | Error> {
+  ): Promise<{ data: Array<ProductEntity>; total: number } | Error> {
     try {
       this.logger.verbose('.listAllProduct', { page, limit });
 
-      return this.rateRepository.find({
+      const total = await this.productRepository.count();
+      const data = await this.productRepository.find({
         skip: (page - 1) * limit,
         take: limit,
       });
+      return {
+        data,
+        total,
+      };
     } catch (e) {
       this.logger.error((e as Error).message);
 
@@ -33,7 +38,7 @@ export class ProductRepository {
     try {
       this.logger.verbose('.getOneProduct'), { code };
 
-      const result = await this.rateRepository.findOne({
+      const result = await this.productRepository.findOne({
         where: { ma: code },
       });
 
@@ -71,7 +76,7 @@ export class ProductRepository {
         screen,
       });
 
-      const result = await this.rateRepository.insert({
+      const result = await this.productRepository.insert({
         ram,
         gia: price,
         ma_loai: categoryCode,
@@ -114,7 +119,7 @@ export class ProductRepository {
         so_luong: count,
       });
 
-      const result = await this.rateRepository.update(
+      const result = await this.productRepository.update(
         { ma: code },
         {
           ram,
@@ -144,7 +149,7 @@ export class ProductRepository {
         code,
       });
 
-      const result = await this.rateRepository.delete({
+      const result = await this.productRepository.delete({
         ma: code,
       });
 

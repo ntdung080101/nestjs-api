@@ -58,18 +58,21 @@ export class ProductController {
 
   @Get('list')
   @ApiOperation({ summary: 'list product' })
-  async listAllProduct(
-    @Query() query: ListAllProductDto,
-  ): Promise<
-    BaseResponseInterface<
-      Array<ProductEntity & { imagePath?: Array<string>; loai: string }>
-    >
+  async listAllProduct(@Query() query: ListAllProductDto): Promise<
+    BaseResponseInterface<{
+      data: Array<ProductEntity & { imagePath?: Array<string>; loai: string }>;
+      total: number;
+    }>
   > {
     this.logger.verbose('.listProduct', { query });
 
-    let result = await this.queryBus.execute<
+    const result = await this.queryBus.execute<
       ListAllProductQuery,
-      Array<ProductEntity & { loai: string }> | Error
+      | {
+          data: Array<ProductEntity & { loai: string }>;
+          total: number;
+        }
+      | Error
     >(new ListAllProductQuery(query.page, query.limit));
 
     if (result instanceof Error) {
@@ -93,7 +96,7 @@ export class ProductController {
       };
     }
 
-    result = result.map((el) => {
+    const resultMap = result.data.map((el) => {
       const category = listCategory.find(
         (category) => category.ma === el.ma_loai,
       );
@@ -106,18 +109,18 @@ export class ProductController {
 
     const productFull: Array<
       ProductEntity & { imagePath: Array<string>; loai: string }
-    > = result.map((el) => {
+    > = resultMap.map((el) => {
       return {
         ...el,
         imagePath: [],
       };
     });
 
-    for (let index = 0; index < result.length; index++) {
+    for (let index = 0; index < resultMap.length; index++) {
       const imageResult = await this.queryBus.execute<
         ListProductImageQuery,
         Array<ProductImageEntity> | Error
-      >(new ListProductImageQuery(result[index].ma));
+      >(new ListProductImageQuery(resultMap[index].ma));
 
       if (imageResult instanceof Error) {
         productFull[index]['imagePath'] = [''];
@@ -128,7 +131,10 @@ export class ProductController {
 
     return {
       statusCode: 200,
-      message: productFull,
+      message: {
+        data: productFull,
+        total: result.total,
+      },
       error: undefined,
     };
   }

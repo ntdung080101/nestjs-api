@@ -23,6 +23,8 @@ export class OrderModule implements NestModule {
       .apply(AuthMiddleware)
       .forRoutes({ path: 'order/update', method: RequestMethod.PUT })
       .apply(AuthMiddleware)
+      .forRoutes({ path: 'order/list-order-of-me', method: RequestMethod.GET })
+      .apply(AuthMiddleware)
       .forRoutes({ path: 'order/create', method: RequestMethod.POST })
       .apply(AuthMiddleware)
       .forRoutes({ path: 'order/delete', method: RequestMethod.DELETE });

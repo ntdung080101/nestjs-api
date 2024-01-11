@@ -24,6 +24,22 @@ export class OrderRepository {
     }
   }
 
+  async listAllOrderByType(type: number): Promise<Array<OrderEntity> | Error> {
+    try {
+      this.logger.verbose('.listAllOrderByType');
+
+      return this.orderRepository.find({
+        where: {
+          loai: type,
+        },
+      });
+    } catch (e) {
+      this.logger.error((e as Error).message);
+
+      return e as Error;
+    }
+  }
+
   async listOrderOfMe(
     customerCode: number,
   ): Promise<Array<OrderEntity> | Error> {
